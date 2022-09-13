@@ -5,32 +5,38 @@ use wiring::*;
 
 struct App {
     led: u32,
+    counter: u32,
 }
 
 impl App {
     fn new() -> Self {
-        println("Rust is running 😎");
+        println("Rust is running");
 
         let led = getPinLED();
+        let counter = 0;
         pinMode(led, OUTPUT);
-        Self { led }
+        Self { led, counter }
     }
 
-    fn run(&self) {
+    fn run(&mut self) {
+
         print("h,");
-        printInt(getPm2_5());
+        printInt(self.counter);
+        print(",");
+        printInt(getPm10()); 
         print(",");
         printInt(getPm2_5());
         print(",");
-        printInt(getPm2_5());
+        printInt(getPm1());
         println("");
         delay(1000);
+        self.counter = self.counter + 1;
     }
 }
 
 #[no_mangle]
 pub extern fn _start() {
-    let app = App::new();
+    let mut app = App::new();
     loop {
         app.run()
     }

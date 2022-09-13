@@ -8,10 +8,11 @@
 #include <wasm3.h>
 #include <Arduino.h>
 #include <PMS.h>
+#include "./app/App.hpp"
 
 PMS pms(Serial1);
 PMS::DATA data;
-
+App app;
 #include <m3_env.h>
 
 /*
@@ -25,12 +26,6 @@ PMS::DATA data;
 
 #define WASM_STACK_SLOTS    2048
 #define NATIVE_STACK_SIZE   (32*1024)
-
-
-#define FATAL(func, msg) { Serial.print("Fatal: " func " "); Serial.println(msg); return; }
-#define TSTART()         { tstart = micros(); }
-#define TFINISH(s)       { tend = micros(); Serial.print(s " in "); Serial.print(tend-tstart); Serial.println(" us"); }
-
 
 // For (most) devices that cannot allocate a 64KiB wasm page
 //#define WASM_MEMORY_LIMIT   4096
@@ -114,9 +109,12 @@ m3ApiRawFunction(m3_arduino_getPinLED)
     m3ApiReturn(LED_PIN);
 }
 
-m3ApiRawFunction(m3_arduino_getSensorValues)
-{
-}
+// m3ApiRawFunction(m3_arduino_getSensorValues)
+// {
+//     m3ApiReturnType (uint32_t)
+
+//     m3ApiReturn(A0);
+// }
 
 m3ApiRawFunction(m3_arduino_getPm2_5)
 {
@@ -209,6 +207,8 @@ M3Result  LinkArduino  (IM3Runtime runtime)
 /*
  * Engine start, liftoff!
  */
+
+#define FATAL(func, msg) { Serial.print("Fatal: " func " "); Serial.println(msg); return; }
 
 void wasm_task(void*)
 {
@@ -333,6 +333,7 @@ void setupPms() {
     pms.wakeUp();
     delay(1000);
     // Serial.println("PMS setup done");
+    
 }
 
 
@@ -340,6 +341,8 @@ void setup()
 {
     Serial.begin(115200);
     setupPms();
+
+    app.setup();
 
     // Wait for serial port to connect
     // Needed for native USB port only
@@ -357,6 +360,7 @@ void setup()
 
 void loop()
 {
+  app.loop();
   pms.requestRead();
   if (pms.readUntil(data))
   {
