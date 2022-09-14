@@ -372,7 +372,7 @@ PACKET_T packet;
 uint8_t counter = 0;;
 
 
-// #define OUTPUT_FORMAT_ASCII
+#define OUTPUT_FORMAT_ASCII
 
 void loop()
 {
@@ -391,10 +391,10 @@ void loop()
 
     #ifdef OUTPUT_FORMAT_ASCII
         Serial.printf("h,%d,%d,%d,%d", packet.counter, packet.pm10, packet.pm2_5, packet.pm1);
-        Serial.write(0x0d);
+        Serial.write(0x0a);
     #else
         Serial.write((uint8_t*)&packet, sizeof(packet));
-        Serial.write(0x0d);
+        Serial.write(0x0a);
     #endif
 
     counter++;
