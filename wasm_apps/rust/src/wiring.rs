@@ -17,6 +17,12 @@ extern {
   #[link_name = "printInt"] fn _print_int(out: u32);
 }
 
+#[link(wasm_import_module = "display")]
+extern {
+  #[link_name = "setTitle"]          fn _setTitle(utf8: *const u8, len: usize);
+  #[link_name = "setDisplayValue"] fn _setDisplayValue(out: u32);
+}
+
 
 #[link(wasm_import_module = "serial")]
 extern {
@@ -44,9 +50,19 @@ pub fn getPm2_5      () -> u32               { unsafe { _getPm2_5() } }
 
 pub fn printInt(out: u32) { unsafe { _print_int(out); } }
 pub fn serialPrintInt(out: u32) { unsafe { unsafe_print_int(out); } }
+
 pub fn print(string: &str) {
     unsafe { _print(string.as_ptr(), string.len()) }
 }
+
+pub fn setTitle(string: &str) {
+    unsafe { _setTitle(string.as_ptr(), string.len()) }
+}
+
+pub fn setDisplayValue(out: u32) {
+    unsafe { _setDisplayValue(out) }
+}
+
 
 pub fn println(string: &str) {
     print(string);
@@ -68,4 +84,5 @@ pub fn println(string: &str) {
 #[panic_handler]
 fn handle_panic(_: &core::panic::PanicInfo) -> ! {
     unsafe { core::arch::wasm32::unreachable() }
+    // core::arch::wasm32::unreachable()
 }

@@ -9,6 +9,8 @@
 #include <Arduino.h>
 #include <PMS.h>
 #include "./app/App.hpp"
+#include "IoTeX-blockchain-client.h"
+#include "secrets.h"
 
 PMS pms(Serial1);
 PMS::DATA data;
@@ -170,11 +172,40 @@ m3ApiRawFunction (m3_arduino_rawSerialOut) {
     m3ApiSuccess();
 }
 
+
+m3ApiRawFunction (m3_display_setTitle) {
+    m3ApiGetArgMem  (const uint8_t *, buf)
+    m3ApiGetArg     (uint32_t,        len)
+    // for (int i = 0; i < len; i++) {
+    //     Serial.print((char)buf[i]);
+    // }
+
+    // char title[32];
+    // // memcpy(title, buf, min(sizeof(title), len));
+    // strncpy(title, (char*)buf, min(sizeof(title), len));
+
+    char title[len + 1];
+    memcpy(title, buf, len);
+    title[len] = '\0';
+
+    app.lcd->setTitle(title);
+
+    m3ApiSuccess();
+}
+
+m3ApiRawFunction (m3_display_setDisplayValue) {
+    m3ApiGetArg (uint16_t, value);
+    app.lcd->setDisplayValue(value);
+    m3ApiSuccess();
+}
+
     // define macro for this
     // m3_LinkRawFunction (module, "wiring", "printInt",            "v(i)",  &m3_arduino_printInt);
 
 #define LINK(module, namespace, name, signature, rawFunction) \
     m3_LinkRawFunction(module, namespace, name, signature, rawFunction)
+
+    
 
 
 M3Result  LinkArduino  (IM3Runtime runtime)
@@ -198,6 +229,9 @@ M3Result  LinkArduino  (IM3Runtime runtime)
     LINK(module, "wiring", "printInt", "v(i)", &m3_arduino_print_int);
 
     m3_LinkRawFunction(module, "serial", "printInt", "v(i)", &m3_arduino_print_int);
+
+    LINK(module, "display", "setTitle", "v(*i)", &m3_display_setTitle);
+    LINK(module, "display", "setDisplayValue", "v(i)", &m3_display_setDisplayValue);
 
 
 
@@ -234,8 +268,6 @@ void wasm_task(void*)
     result = LinkArduino (runtime);
     if (result) FATAL("LinkArduino", result);
 
-
-    Serial.println("Hello World!");
 
     IM3Function ff;
     result = m3_FindFunction (&ff, runtime, "_callback");
@@ -343,6 +375,9 @@ void setup()
     setupPms();
 
     app.setup();
+    app.lcd->setTitle("DustBoy");
+    app.lcd->setLabel("PM 10");
+    // app.lcd->setDisplayValue
 
     // Wait for serial port to connect
     // Needed for native USB port only
@@ -364,6 +399,8 @@ void loop()
   pms.requestRead();
   if (pms.readUntil(data))
   {
+    app.lcd->setDustValue(data.PM_AE_UG_2_5, data.PM_AE_UG_10_0);
+    app.lcd->setDisplayValue(data.PM_AE_UG_10_0);
     // Serial.println("read data done");
     // Serial.print("PM 1.0 (ug/m3): ");
     // Serial.println(data.PM_AE_UG_1_0);

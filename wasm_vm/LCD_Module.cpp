@@ -95,11 +95,15 @@ void LCD_Module::paintRunPage()
     {
       pad = 0;
     }
+
+/*
+RTC
     static char buffer[15] = {0};
     sprintf(buffer, "%02d:%02d", hh, mm);
     u8g2->setFont(u8g2_font_p01type_tf);
     u8g2->setCursor(5, 7);
     u8g2->print(buffer);
+*/
 
     // https://github.com/olikraus/u8g2/wiki/fntgrpunifont
     /*sdcardModule.is_no_sdcard*/
@@ -110,7 +114,7 @@ void LCD_Module::paintRunPage()
     }
 
     u8g2->setFont(u8g2_font_tenthinguys_tf);
-    u8g2->drawStr(65, 10, "DustBoy");
+    u8g2->drawStr(65, 10, this->_title);
     u8g2->drawLine(2, 38, 124, 38);
 
     u8g2->setCursor(90, 6);
@@ -118,11 +122,11 @@ void LCD_Module::paintRunPage()
 
     u8g2->setFont(u8g2_font_koleeko_tf);
     u8g2->setCursor(2, 25 + 2 + 2);
-    u8g2->print("PM2.5");
+    u8g2->print(this->_label);
     u8g2->setCursor(40 + pad, 30 + 2 + 2);
     u8g2->setFont(u8g2_font_luBS19_tn);
 
-    u8g2->print(_pm2_5);
+    u8g2->print(this->_pmValue);
     u8g2->setFont(u8g2_font_siji_t_6x10);
     u8g2->print("ug/m3");
 

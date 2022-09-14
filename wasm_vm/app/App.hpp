@@ -25,11 +25,11 @@ static uint8_t g_btns[] = {0};
 #include <Ticker.h>
 
 // extern DustModule *dustModule;
-LCD_Module *lcd;
 class App
 {
 public:
     // RTCModule *rtcModule;
+    LCD_Module *lcd;
     void attachCb() {
         // for (int i = 0; i < sizeof(g_btns) / sizeof(g_btns[0]); ++i)
         // {
