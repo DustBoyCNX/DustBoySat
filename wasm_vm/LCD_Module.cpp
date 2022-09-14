@@ -65,7 +65,7 @@ void LCD_Module::loop()
   that->paintRunPage();
 }
 
-int counter = 0;
+// int counter = 0;
 
 void LCD_Module::printConnectWiFi()
 {
@@ -87,7 +87,7 @@ void LCD_Module::paintRunPage()
 
   do
   {
-    counter++;
+    // counter++;
     // u8g2->drawXBM(90, -2, 32, 16, a_bits);
     int pad = 10;
     // _pm2_5 = 888;

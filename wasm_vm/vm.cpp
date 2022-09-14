@@ -1,9 +1,3 @@
-/*
- * Wasm3 - high performance WebAssembly interpreter written in C.
- * Copyright © 2020 Volodymyr Shymanskyy, Steven Massey.
- * All rights reserved.
- */
-
 #include <Arduino.h>
 #include <wasm3.h>
 #include <Arduino.h>
@@ -12,9 +6,15 @@
 #include "IoTeX-blockchain-client.h"
 #include "secrets.h"
 
+
+#define BRIDGE_WASM_VM 1
+
 PMS pms(Serial1);
-PMS::DATA data;
+PMS::DATA _pmsData;
 App app;
+
+DustModule dustModule(&Serial1);
+
 #include <m3_env.h>
 
 /*
@@ -118,11 +118,23 @@ m3ApiRawFunction(m3_arduino_getPinLED)
 //     m3ApiReturn(A0);
 // }
 
+m3ApiRawFunction(m3_arduino_getPm10)
+{
+    m3ApiReturnType (uint32_t)
+    m3ApiReturn(_pmsData.PM_AE_UG_10_0);
+}
+
 m3ApiRawFunction(m3_arduino_getPm2_5)
 {
     m3ApiReturnType (uint32_t)
-    // Serial.printf("host: get pm2.5 value: %d\r\n", data.PM_AE_UG_2_5);
-    m3ApiReturn(data.PM_AE_UG_2_5);
+    m3ApiReturn(_pmsData.PM_AE_UG_2_5);
+}
+
+
+m3ApiRawFunction(m3_arduino_getPm1)
+{
+    m3ApiReturnType (uint32_t)
+    m3ApiReturn(_pmsData.PM_AE_UG_1_0);
 }
 
 m3ApiRawFunction(m3_arduino_print)
@@ -132,7 +144,6 @@ m3ApiRawFunction(m3_arduino_print)
 
     //printf("api: print %p %d\n", buf, len);
     Serial.write(buf, len);
-
     m3ApiSuccess();
 }
 
@@ -140,18 +151,9 @@ m3ApiRawFunction(m3_arduino_printInt)
 {
     m3ApiGetArg(int32_t, out);
     Serial.print(out);
-
     m3ApiSuccess();
 }
 
-m3ApiRawFunction(m3_arduino_print_int)
-{
-  m3ApiGetArg(int32_t, out);
-
-  Serial.print(out);
-
-  m3ApiSuccess();
-}
 
 m3ApiRawFunction(m3_arduino_getGreeting)
 {
@@ -211,29 +213,24 @@ m3ApiRawFunction (m3_display_setDisplayValue) {
 M3Result  LinkArduino  (IM3Runtime runtime)
 {
     IM3Module module = runtime->modules;
-    // const char* arduino = "arduino";
-
     LINK(module, "wiring", "millis",           "i()",    &m3_arduino_millis);
     LINK(module, "wiring", "delay",            "v(i)",   &m3_arduino_delay);
     LINK(module, "wiring", "pinMode",          "v(ii)",  &m3_arduino_pinMode);
     LINK(module, "wiring", "digitalWrite",     "v(ii)",  &m3_arduino_digitalWrite);
 
-    // Test functions
     LINK(module, "wiring", "getPinLED",        "i()",    &m3_arduino_getPinLED);
+    LINK(module, "wiring", "getPm10",        "i()",    &m3_arduino_getPm10);
     LINK(module, "wiring", "getPm2_5",        "i()",    &m3_arduino_getPm2_5);
-    LINK(module, "wiring", "getPm10",        "i()",    &m3_arduino_getPinLED);
-    LINK(module, "wiring", "getPm1",        "i()",    &m3_arduino_getPinLED);
+    LINK(module, "wiring", "getPm1",        "i()",    &m3_arduino_getPm1);
     LINK(module, "wiring", "getGreeting",      "v(*i)",  &m3_arduino_getGreeting);
     LINK(module, "wiring", "rawSerialOut", "v(i)", &m3_arduino_rawSerialOut);
     LINK(module, "wiring", "print",            "v(*i)",  &m3_arduino_print);
-    LINK(module, "wiring", "printInt", "v(i)", &m3_arduino_print_int);
+    LINK(module, "wiring", "printInt", "v(i)", &m3_arduino_printInt);
 
-    m3_LinkRawFunction(module, "serial", "printInt", "v(i)", &m3_arduino_print_int);
+    m3_LinkRawFunction(module, "serial", "printInt", "v(i)", &m3_arduino_printInt);
 
     LINK(module, "display", "setTitle", "v(*i)", &m3_display_setTitle);
     LINK(module, "display", "setDisplayValue", "v(i)", &m3_display_setDisplayValue);
-
-
 
     return m3Err_none;
 }
@@ -323,60 +320,28 @@ void wasm_task(void*)
 
 }
 
-
-
-// // void setup()
-// // {
-// //   Serial.begin(115200);   // GPIO1, GPIO3 (TX/RX pin on ESP-12E Development Board)
-// //   // Serial1.begin(9600);  // GPIO2 (D4 pin on ESP-12E Development Board)
-// //   Serial1.begin(9600, SERIAL_8N1, 32, 33);
-// //   pms.passiveMode();    // Switch to passive mode
-// //   pms.wakeUp();
-// //   delay(1000);
-// // }
-
-// // void loop()
-// // {
-// //   pms.requestRead();
-// //   if (pms.readUntil(data))
-// //   {
-// //     Serial.print("PM 1.0 (ug/m3): ");
-// //     Serial.println(data.PM_AE_UG_1_0);
-
-// //     Serial.print("PM 2.5 (ug/m3): ");
-// //     Serial.println(data.PM_AE_UG_2_5);
-
-// //     Serial.print("PM 10.0 (ug/m3): ");
-// //     Serial.println(data.PM_AE_UG_10_0);
-// //   }
-// //   else
-// //   {
-// //     Serial.println("No data.");
-// //   }
-
-// //   Serial.println("Going to sleep for 60 seconds.");
-// //   pms.sleep();
-// //   delay(100);
-// // }
-
 void setupPms() {
     Serial1.begin(9600, SERIAL_8N1, 32, 33);
     pms.passiveMode();    // Switch to passive mode
     pms.wakeUp();
-    delay(1000);
+    // detect boot from deepsleep 
+    if (rtc_get_reset_reason(0) == DEEPSLEEP_RESET) {
+        // Serial.println("Woke from deep sleep");
+    } else {
+        // Serial.println("Power on or reset");
+    }
     // Serial.println("PMS setup done");
-    
 }
-
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(9600, SERIAL_8N1);
     setupPms();
 
+
     app.setup();
-    app.lcd->setTitle("DustBoy");
-    app.lcd->setLabel("PM 10");
+    app.lcd->setTitle("RustBoy!");
+    app.lcd->setLabel("PM 2.5");
     // app.lcd->setDisplayValue
 
     // Wait for serial port to connect
@@ -393,30 +358,69 @@ void setup()
 #endif
 }
 
+ typedef struct __attribute((__packed__)) {
+    uint8_t header = 0x68;
+    uint8_t counter;
+    uint16_t pm10;
+    uint16_t pm2_5;
+    uint16_t pm1;
+    uint8_t tail = 0x66;
+  } PACKET_T;
+
+
+PACKET_T packet;
+uint8_t counter = 0;;
+
+
+// #define OUTPUT_FORMAT_ASCII
+
 void loop()
 {
-  app.loop();
+  app.loop(); 
   pms.requestRead();
-  if (pms.readUntil(data))
-  {
-    app.lcd->setDustValue(data.PM_AE_UG_2_5, data.PM_AE_UG_10_0);
-    app.lcd->setDisplayValue(data.PM_AE_UG_10_0);
-    // Serial.println("read data done");
-    // Serial.print("PM 1.0 (ug/m3): ");
-    // Serial.println(data.PM_AE_UG_1_0);
+  if (pms.readUntil(_pmsData)) {
+    app.lcd->setDustValue(_pmsData.PM_AE_UG_2_5, _pmsData.PM_AE_UG_10_0);
+    app.lcd->setDisplayValue(_pmsData.PM_AE_UG_10_0);
 
-    // Serial.print("PM 2.5 (ug/m3): ");
-    // Serial.println(data.PM_AE_UG_2_5);
+    packet.header = 0x68;
+    packet.counter = counter;
+    packet.pm10 = _pmsData.PM_AE_UG_10_0;
+    packet.pm2_5 = _pmsData.PM_AE_UG_2_5;
+    packet.pm1 = _pmsData.PM_AE_UG_1_0;
+    packet.tail = 0x66;
 
-    // Serial.print("PM 10.0 (ug/m3): ");
-    // Serial.println(data.PM_AE_UG_10_0);
+    #ifdef OUTPUT_FORMAT_ASCII
+        Serial.printf("h,%d,%d,%d,%d", packet.counter, packet.pm10, packet.pm2_5, packet.pm1);
+        Serial.write(0x0d);
+    #else
+        Serial.write((uint8_t*)&packet, sizeof(packet));
+        Serial.write(0x0d);
+    #endif
+
+    counter++;
+
   }
   else
   {
     Serial.println("No data.");
   }
 
+    char buffer[4] = {0};
+    if (Serial.read() == '`' /* 0x60 */) {
+        Serial.println(Serial.readBytes(buffer, 3));
+        if (buffer[2] =='!') {
+            if (buffer[0] == 's')  {
+                Serial.printf("sleep time = %d seconds\r\n", buffer[1]);
+                app.lcd->wipe();
+                delay(10);
+                esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
+                esp_deep_sleep_start();
+            }
+        }
+        strcpy(buffer, "");
+    }
+
 //   Serial.println("Going to sleep for 60 seconds.");
-  pms.sleep();
-  delay(100);
+//   pms.sleep();
+  delay(1000);
 }

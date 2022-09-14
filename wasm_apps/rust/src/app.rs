@@ -20,18 +20,18 @@ impl App {
     }
 
     fn run(&mut self) {
-        setTitle("    Rust!");
+        setTitle("DustBoy");
         // setDisplayValue(self.counter.into());
-        print("h,");
-        printInt(self.counter.into());
-        print(",");
-        // printInt(getPm10()); 
-        printInt(self.pm10.into()); 
-        print(",");
-        printInt(self.pm2_5.into());
-        print(",");
-        printInt(self.pm1.into());
-        println("");
+        // print("h,");
+        // printInt(self.counter.into());
+        // print(",");
+        // // printInt(getPm10()); 
+        // printInt(self.pm10.into()); 
+        // print(",");
+        // printInt(self.pm2_5.into());
+        // print(",");
+        // printInt(self.pm1.into());
+        // println("");
         delay(1000);
 
         self.counter = self.counter + 1;

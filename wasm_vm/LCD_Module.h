@@ -34,6 +34,14 @@ public:
     this->_pmValue = pmValue;
   }
 
+  void wipe() {
+    this->setDisplayValue(0);
+    this->setLabel(" ");
+    this->setTitle(" ");
+    this->loop();
+    this->u8g2->clearDisplay();
+  }
+
 private:
   uint8_t hh = 0;
   uint8_t mm = 0;
