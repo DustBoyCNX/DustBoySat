@@ -435,6 +435,9 @@ void setupBle()
 void setup()
 {
     Serial.begin(9600, SERIAL_8N2);
+    WiFi.softAPdisconnect(true);
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
     setupPms();
     // setupBle();
 
