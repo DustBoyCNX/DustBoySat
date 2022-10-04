@@ -1,10 +1,5 @@
 const BinParser = require("binary-parser").Parser;
-
-// import { parsers } from "serialport";
 import { DelimiterParser, SerialPort } from "serialport";
-// var port = new SerialPort('/dev/ttyUSB0', {
-//     baudRate: 230400
-//   });
 
 const toHexString = function (arr: any) {
   return Buffer.from(arr).toString("hex");
