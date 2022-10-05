@@ -77,7 +77,7 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-output = "ASCII";
+output = "BIN";
 mode = "MOCKUP";
 
 async function run() {
