@@ -12,7 +12,7 @@ struct App {
 
 impl App {
     fn new() -> Self {
-        println("Rust is running");
+        // println("Rust is running");
         let led = getPinLED();
         let counter = 0;
         pinMode(led, OUTPUT);
@@ -49,7 +49,7 @@ pub extern fn _start() {
 
 #[no_mangle]
 pub extern fn _callback() {
-    println("Callback called");
+    // println("Callback called");
 }
 
 

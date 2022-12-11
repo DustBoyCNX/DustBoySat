@@ -350,7 +350,7 @@ void wasm_task(void *)
     result = m3_FindFunction(&ff, runtime, "_callback");
     if (result)
         FATAL("FindFunction", result);
-    Serial.println("Running callback...");
+    // Serial.println("Running callback...");
 
     result = m3_CallV(ff);
     if (result)
@@ -376,7 +376,7 @@ void wasm_task(void *)
     if (result)
         FATAL("FindFunction", result);
 
-    Serial.println("Running WebAssembly...");
+    // Serial.println("Running WebAssembly...");
 
     result = m3_CallV(f);
 
@@ -450,7 +450,7 @@ void setup()
     // Needed for native USB port onl
     // while(!Serial) {}
 
-    Serial.println("\nWasm3 v" M3_VERSION " (" M3_ARCH "), build " __DATE__ " " __TIME__);
+    // Serial.println("\nWasm3 v" M3_VERSION " (" M3_ARCH "), build " __DATE__ " " __TIME__);
 
 #ifdef ESP32
     // On ESP32, we can launch in a separate thread
@@ -486,6 +486,8 @@ enum OUTPUT_MODE
 uint8_t mode = OUTPUT_MODE_ASCII;
 bool isMockup = false;
 
+const uint8_t MINUTES_IN_SECONDS = 3*60;
+
 void loop()
 {
     app.loop();
@@ -511,14 +513,18 @@ void loop()
         packet.pm1 = 19;
     }
 
-    if (mode == OUTPUT_MODE_ASCII)
+
+    if (counter >= MINUTES_IN_SECONDS)
     {
-        Serial.printf("h,%d,%d,%d,%d", packet.counter, packet.pm10, packet.pm2_5, packet.pm1);
-        Serial.write(0x0a);
-    }
-    else if (mode == OUTPUT_MODE_BINARY)
-    {
-        Serial.write((uint8_t *)&packet, sizeof(packet));
+        if (mode == OUTPUT_MODE_ASCII)
+        {
+            Serial.printf("h,%d,%d,%d,%d", packet.counter, packet.pm10, packet.pm2_5, packet.pm1);
+            Serial.write(0x0a);
+        }
+        else if (mode == OUTPUT_MODE_BINARY)
+        {
+            Serial.write((uint8_t *)&packet, sizeof(packet));
+        }
     }
 
     counter++;
@@ -536,30 +542,35 @@ void loop()
         Serial.readBytes(buffer, 3);
         if (buffer[2] == '!')
         {
-            if (buffer[0] == 's')
+            if (buffer[0] == 's') // `s1!
             {
-                Serial.printf("sleep time = %d seconds\r\n", buffer[1]);
+                Serial.printf("%d", (int)buffer[1]);
                 app.lcd->wipe();
                 delay(10);
-                esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
+                if (buffer[1] == '!') {
+                    esp_sleep_enable_timer_wakeup(MINUTES_IN_SECONDS*1000000);
+                }
+                else {
+                    esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
+                }
                 esp_deep_sleep_start();
             }
             else if (buffer[0] == 'm')
             {
-                if (buffer[1] == 'A')
+                if (buffer[1] == 'A') // `mA!
                 {
                     Serial.println("mode ASCII");
                     mode = OUTPUT_MODE_ASCII;
                 }
-                else if (buffer[1] == 'B')
+                else if (buffer[1] == 'B') // `mB!
                 {
                     mode = OUTPUT_MODE_BINARY;
                 }
-                else if (buffer[1] == 'M')
+                else if (buffer[1] == 'M') // `mM!
                 {
                     isMockup = true;
                 }
-                else if (buffer[1] == 'N')
+                else if (buffer[1] == 'N') // `mN!
                 {
                     isMockup = false;
                 }

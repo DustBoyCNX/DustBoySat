@@ -113,6 +113,25 @@ void Signer::signMessage(const uint8_t* message, size_t size,
 {
 	uint8_t hash[IOTEX_HASH_SIZE] = {0};
 	getEthereumMessageHash(message, size, hash);
+	//  print all message
+
+	Serial.println("MESSAGE: ");
+	for(int i = 0; i < size; i++)
+	{
+		Serial.printf("%02x", message[i]);
+	}
+	Serial.println();
+
+
+	// print all hash
+	// (logModule, "Hash: ");
+	Serial.println("HASH: ");
+	for(int i = 0; i < IOTEX_HASH_SIZE; i++)
+	{
+		// IOTEX_TRACE_F(logModule, "%02x", hash[i]);
+		Serial.printf("%02x", hash[i]);
+	}
+	Serial.println();
 	signHash(hash, privateKey, signature);
 }
 
