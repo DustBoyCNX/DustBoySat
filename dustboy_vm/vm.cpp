@@ -544,13 +544,14 @@ void loop()
         {
             if (buffer[0] == 's') // `s1!
             {
-                Serial.printf("%d", (int)buffer[1]);
                 app.lcd->wipe();
                 delay(10);
-                if (buffer[1] == '!') {
-                    esp_sleep_enable_timer_wakeup(MINUTES_IN_SECONDS*1000000);
+                if (buffer[1] == '!') { // `s!!
+                    Serial.printf("10");
+                    esp_sleep_enable_timer_wakeup(10*60*1000000);
                 }
                 else {
+                    Serial.printf("%d", (int)buffer[1]);
                     esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
                 }
                 esp_deep_sleep_start();
