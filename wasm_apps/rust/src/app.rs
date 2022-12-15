@@ -16,7 +16,12 @@ impl App {
         let led = getPinLED();
         let counter = 0;
         pinMode(led, OUTPUT);
-        Self { counter, pm10: 0, pm2_5: 0, pm1: 0 }
+        Self {
+            counter,
+            pm10: 0,
+            pm2_5: 0,
+            pm1: 0,
+        }
     }
 
     fn run(&mut self) {
@@ -25,8 +30,8 @@ impl App {
         // print("h,");
         // printInt(self.counter.into());
         // print(",");
-        // // printInt(getPm10()); 
-        // printInt(self.pm10.into()); 
+        // // printInt(getPm10());
+        // printInt(self.pm10.into());
         // print(",");
         // printInt(self.pm2_5.into());
         // print(",");
@@ -39,22 +44,20 @@ impl App {
 }
 
 #[no_mangle]
-pub extern fn _start() {
+pub extern "C" fn _start() {
     let mut app = App::new();
     loop {
         app.run()
     }
 }
 
-
 #[no_mangle]
-pub extern fn _callback() {
+pub extern "C" fn _callback() {
     // println("Callback called");
 }
 
-
 #[no_mangle]
-pub extern fn updatePmValue(pm10:u16, pm2_5:u16, pm1:u16) {
+pub extern "C" fn updatePmValue(pm10: u16, pm2_5: u16, pm1: u16) {
     println("updatePmValue called");
     print("u,");
     printInt(pm10.into());
@@ -64,8 +67,6 @@ pub extern fn updatePmValue(pm10:u16, pm2_5:u16, pm1:u16) {
     printInt(pm1.into());
     println("");
 }
-
-
 
 // pub extern fn updatePmValue(u16 _pm10, u16 _pm2_5, u16 _pm1) {
 //     println("updatePmValue");
