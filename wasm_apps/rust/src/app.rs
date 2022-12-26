@@ -12,7 +12,6 @@ struct App {
 
 impl App {
     fn new() -> Self {
-        // println("Rust is running");
         let led = getPinLED();
         let counter = 0;
         pinMode(led, OUTPUT);
@@ -26,20 +25,9 @@ impl App {
 
     fn run(&mut self) {
         setTitle("DustBoy");
-        // setDisplayValue(self.counter.into());
-        // print("h,");
-        // printInt(self.counter.into());
-        // print(",");
-        // // printInt(getPm10());
-        // printInt(self.pm10.into());
-        // print(",");
-        // printInt(self.pm2_5.into());
-        // print(",");
-        // printInt(self.pm1.into());
-        // println("");
         delay(1000);
 
-        self.counter = self.counter + 1;
+        self.counter += 1;
     }
 }
 
@@ -52,9 +40,7 @@ pub extern "C" fn _start() {
 }
 
 #[no_mangle]
-pub extern "C" fn _callback() {
-    // println("Callback called");
-}
+pub extern "C" fn _callback() {}
 
 #[no_mangle]
 pub extern "C" fn updatePmValue(pm10: u16, pm2_5: u16, pm1: u16) {
@@ -67,10 +53,3 @@ pub extern "C" fn updatePmValue(pm10: u16, pm2_5: u16, pm1: u16) {
     printInt(pm1.into());
     println("");
 }
-
-// pub extern fn updatePmValue(u16 _pm10, u16 _pm2_5, u16 _pm1) {
-//     println("updatePmValue");
-//     pm10 = _pm10;
-//     // pm2_5 = _pm2_5;
-//     // pm1 = _pm1;
-// }
