@@ -1,46 +1,46 @@
-#include <Arduino.h>
+// #include <Arduino.h>
 
-#define MAX_HEX_LENGTH 256
-#define MAX_BYTE_ARRAY_LENGTH 32
+// #define MAX_HEX_LENGTH 256
+// #define MAX_BYTE_ARRAY_LENGTH 32
 
-const char HexCharacters[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+// const char HexCharacters[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-char *hexlify(const unsigned char *value, int valueLength) {
-    char *hex = (char *)malloc(MAX_HEX_LENGTH);
-    memset(hex, 0, MAX_HEX_LENGTH);
-    strcpy(hex, "0x");
+// char *hexlify(const unsigned char *value, int valueLength) {
+//     char *hex = (char *)malloc(MAX_HEX_LENGTH);
+//     memset(hex, 0, MAX_HEX_LENGTH);
+//     strcpy(hex, "0x");
 
-    for (int i = 0; i < valueLength; i++) {
-        char byteHex[3];
-        memset(byteHex, 0, 3);
-        sprintf(byteHex, "%02x", value[i]);
-        strcat(hex, byteHex);
-    }
+//     for (int i = 0; i < valueLength; i++) {
+//         char byteHex[3];
+//         memset(byteHex, 0, 3);
+//         sprintf(byteHex, "%02x", value[i]);
+//         strcat(hex, byteHex);
+//     }
 
-    return hex;
-}
+//     return hex;
+// }
 
-void setup() {
-    Serial.begin(115200);
+// void setup() {
+//     Serial.begin(115200);
 
-    // unsigned char value[MAX_BYTE_ARRAY_LENGTH] = { 0x30, 0x39, 0x32, 0x35, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 };
-    unsigned char testData[MAX_BYTE_ARRAY_LENGTH] = {
-        239,   1, 133,  23,  72, 118, 232,   0, 131,  1,
-        72,  32, 148, 112, 153, 121, 112, 197,  24, 18,
-        220,  58,   1,  12, 125,   1, 181,  14,  13, 23,
-        220, 121, 200, 137,   5, 107, 199,  94,  45, 99,
-        16,   0,   0, 128, 129, 255, 128, 128 };
-    int testDataLength = 48;
-    int valueLength = 32;
-    // char *hex = hexlify(value, valueLength);
-    char *hex = hexlify(testData, testDataLength);
-    Serial.println(hex);
-    // 0xef01851 7729be 8008370 14870499170c511612c00c7d008d0e0d17dc79c88957c75e2d6          310010000 8181ff8080
-    // 0xef01851 74876e 800830  148209470997970c51812dc3a010c7d01b50e0d17dc79c889056bc75e2d6 310000080   81ff8080
-    free(hex);
-}
+//     // unsigned char value[MAX_BYTE_ARRAY_LENGTH] = { 0x30, 0x39, 0x32, 0x35, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 };
+//     unsigned char testData[MAX_BYTE_ARRAY_LENGTH] = {
+//         239,   1, 133,  23,  72, 118, 232,   0, 131,  1,
+//         72,  32, 148, 112, 153, 121, 112, 197,  24, 18,
+//         220,  58,   1,  12, 125,   1, 181,  14,  13, 23,
+//         220, 121, 200, 137,   5, 107, 199,  94,  45, 99,
+//         16,   0,   0, 128, 129, 255, 128, 128 };
+//     int testDataLength = 48;
+//     int valueLength = 32;
+//     // char *hex = hexlify(value, valueLength);
+//     char *hex = hexlify(testData, testDataLength);
+//     Serial.println(hex);
+//     // 0xef01851 7729be 8008370 14870499170c511612c00c7d008d0e0d17dc79c88957c75e2d6          310010000 8181ff8080
+//     // 0xef01851 74876e 800830  148209470997970c51812dc3a010c7d01b50e0d17dc79c889056bc75e2d6 310000080   81ff8080
+//     free(hex);
+// }
 
-void loop() {}
+// void loop() {}
 
 
 // #include <Arduino.h>
