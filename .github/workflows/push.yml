@@ -66,7 +66,7 @@ jobs:
           # cp -Rv .pio/build/$BOARD_ENV/bootloader.bin "$HOME"
           # cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
 
-          zip --junk-paths $HOME/my-artifact $HOME/.pio/build/$BOARD_ENV/*.bin $HOME/*.sh
+          zip --junk-paths $HOME/my-artifact $HOME/.pio/build/$BOARD_ENV/*.bin $HOME/*.bin $HOME/*.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
