@@ -54,13 +54,15 @@ jobs:
           # 2> /dev/null
           # find $HOME/.pio
           # find $HOME/.platformio/packages
+          export BOARD_ENV="ESP32"
 
-          cp -Rv $HOME/.pio/build/nano32/firmware.bin "$HOME/firmware.bin"
-          cp -Rv $HOME/.pio/build/nano32/partitions.bin "$HOME/partitions.bin"
+          cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME/firmware.bin"
+          cp -Rv $HOME/.pio/build/$BOARD_ENV/bootloader.bin "$HOME/bootloader_built.bin"
+          cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME/partitions.bin"
           #  .platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin
           # "/opt/homebrew/opt/python@3.9/bin/python3.9" "/Users/nat/.platformio/packages/tool-esptoolpy/esptool.py" --chip esp32 --port "/dev/tty.SLAB_USBtoUART" --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /Users/nat/.platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin 0x8000 /Users/nat/DustBoyCode/DustBoymini-model-N/.pio/build/nano32/partitions.bin 0xe000 /Users/nat/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/nano32/firmware.bin
 
-          cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin $HOME
+          # cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin $HOME
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin $HOME
 
           $HOME/.platformio/packages/tool-mkspiffs/mkspiffs_espressif32_arduino -c data -p 256 -b 4096 -s 192512 $HOME/.pio/build/nano32/spiffs.bin
