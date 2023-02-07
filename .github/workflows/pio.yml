@@ -26,6 +26,6 @@ jobs:
       - name: pio run
         run: pio run
       - name: Build PlatformIO 
-        run: pio ci --project-option="lib_tdf_mode=chain+" --lib="./lib" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
+        run: pio ci --project-option="lib_tdf_mode=chain+" --lib="./lib/*" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
         env:
           PLATFORMIO_CI_SRC: ${{ matrix.example }}
