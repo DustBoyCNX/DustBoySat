@@ -23,7 +23,7 @@ App app;
  */
 
 #include "vm_binding.hpp"
-#define DELAY_S 2
+#define DELAY_S 10
 
 void setupPms();
 
