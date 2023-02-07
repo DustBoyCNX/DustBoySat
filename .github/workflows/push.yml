@@ -39,14 +39,11 @@ jobs:
           platformio ci --lib="./lib/*" --project-option="lib_tdf_mode=chain+" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" ./dustboy_vm
       - name: Prepare artifacts
         run: |
-          export BOARD_ENV="ESP32"
 
           find $HOME | grep .bin$
 
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME"
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME"
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/bootloader.bin "$HOME"
-          cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
+          export BOARD_ENV="ESP32"
+
 
           echo "esptool.py --chip esp32 \
             --baud 460800 \
@@ -59,7 +56,17 @@ jobs:
             --flash_size 4MB \
             0x1000 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > "$HOME/flash.sh"
 
-          zip --junk-paths $HOME/my-artifact $HOME/*.bin $HOME/*.sh
+          # cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME"
+          # cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME"
+          # cp -Rv $HOME/.pio/build/$BOARD_ENV/bootloader.bin "$HOME"
+          # cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
+
+          # cp -Rv .pio/build/$BOARD_ENV/firmware.bin "$HOME"
+          # cp -Rv .pio/build/$BOARD_ENV/partitions.bin "$HOME"
+          # cp -Rv .pio/build/$BOARD_ENV/bootloader.bin "$HOME"
+          # cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
+
+          zip --junk-paths $HOME/my-artifact $HOME/.pio/build/$BOARD_ENV/*.bin $HOME/*.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
