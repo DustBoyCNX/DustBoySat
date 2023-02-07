@@ -46,8 +46,7 @@ jobs:
           pip install --upgrade platformio
       - name: Build firmware
         run: |
-          # platformio run -d ${{ matrix.example }}.
-          platformio ci --project-option="lib_tdf_mode=chain+" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
+          platformio ci --project-option="lib_tdf_mode=chain+" --lib --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
       - name: Prepare artifacts
         run: |
           # pio run --project-conf=./platformio.ini
