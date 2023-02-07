@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "sleep": "ts-node src/sleep.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "binary-parser": "^2.2.1",
-    "serialport": "^10.4.0"
+    "serialport": "^10.4.0",
+    "ts-node": "^10.9.1"
   }
 }

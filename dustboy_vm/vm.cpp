@@ -156,7 +156,7 @@ void loop()
                 else
                 {
                     Serial.printf("%d", (int)buffer[1]);
-                    esp_sleep_enable_timer_wakeup(buffer[1] * 1000000); // sleep in seconds
+                    esp_sleep_enable_timer_wakeup((uint8_t)buffer[1] * 1000000); // sleep in seconds
                 }
                 esp_deep_sleep_start();
             }
