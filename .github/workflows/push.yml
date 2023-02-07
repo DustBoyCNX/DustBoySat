@@ -1,21 +1,18 @@
-name: ESP32 Arduino CI
+name: DustBoy FW
 
-# on:
-#   push:
-#     branches:
-#     - master
-#     - release/*
 on:
   workflow_dispatch:
     inputs:
       release_name:
         description: "release_name"
+        default: "v0.0.0"
       project_id:
         description: "project_id"
-        default: "custom project name"
-  push:
-    tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+        default: "DustBoySat"
+      body:
+        description: "body"
+        default: "Release Notes"
+
 jobs:
   build:
     strategy:
@@ -25,54 +22,36 @@ jobs:
         python-version: [3.7]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Cache pip
-        uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Cache PlatformIO
-        uses: actions/cache@v2
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
         with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-      - name: Set up Python
-        uses: actions/setup-python@v2
-      - name: Install PlatformIO
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
+          python-version: "3.9"
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
       - name: Build firmware
         run: |
-          pio ci -e ESP32 -l "./lib/*" --project-conf="./platformio.ini" --build-dir="$HOME/hello" --keep-build-dir  dustboy_vm
-          # platformio ci --project-option="lib_tdf_mode=chain+" --lib="./lib/*" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
+          platformio ci --lib="./lib/*" --project-option="lib_tdf_mode=chain+" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" ./dustboy_vm
       - name: Prepare artifacts
         run: |
-          # pio run --project-conf=./platformio.ini
-          # 2> /dev/null
-          # find $HOME/.pio
-          # find $HOME/.platformio/packages
           export BOARD_ENV="ESP32"
 
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME/firmware.bin"
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/bootloader.bin "$HOME/bootloader_built.bin"
-          cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME/partitions.bin"
-          #  .platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin
-          # "/opt/homebrew/opt/python@3.9/bin/python3.9" "/Users/nat/.platformio/packages/tool-esptoolpy/esptool.py" --chip esp32 --port "/dev/tty.SLAB_USBtoUART" --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /Users/nat/.platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin 0x8000 /Users/nat/DustBoyCode/DustBoymini-model-N/.pio/build/nano32/partitions.bin 0xe000 /Users/nat/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/nano32/firmware.bin
+          find $HOME | grep .bin$
 
-          # cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/sdk/bin/bootloader_dio_40m.bin $HOME
+          cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME/firmware.bin"
+          cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME/partitions.bin"
+
+          cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/bin/bootloader_dio_40m.bin $HOME/bootloader_dio_40m.bin
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin $HOME
 
-          $HOME/.platformio/packages/tool-mkspiffs/mkspiffs_espressif32_arduino -c data -p 256 -b 4096 -s 192512 $HOME/.pio/build/nano32/spiffs.bin
+          echo "esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 bootloader_dio_40m.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > "$HOME/flash.sh"
 
-          echo "esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 bootloader_dio_40m.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > flash.sh
-          echo "esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_size detect 4001792 .pio/build/nano32/spiffs.bin
-          # echo "~/.platformio/penv/Scripts/python.exe ~/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 bootloader_dio_40m.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > flashwoody.sh
-
-          zip --junk-paths $HOME/my-artifact $HOME/*.bin flash*.sh
-
+          zip --junk-paths $HOME/my-artifact $HOME/*.bin $HOME/*.sh
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -80,14 +59,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: ${{ github.event.inputs.release_name }}
-          # release_name: ${{ startsWith(github.ref, 'refs/tags/v') }}
-          # release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-          release_name: ${{ github.event.inputs.release_name }}
+          release_name: ${{ github.event.inputs.release_name }}-binary
           body: |
             - ${{ github.ref }}
           draft: false
           prerelease: false
-          # echo "Tags: ${{ github.event.inputs.tags }}"
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -95,7 +71,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: /home/runner/my-artifact.zip
           asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
           asset_content_type: application/zip
@@ -107,6 +82,6 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   with:
       #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-      #     asset_path: /Users/runner/fw.bin
+      #     asset_path: /home/runner/firmware.bin
       #     asset_name: fw.bin
       #     asset_content_type: application/octet-stream
