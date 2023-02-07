@@ -34,16 +34,17 @@ jobs:
           python-version: "3.9"
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
-      - name: Build firmware
-        run: |
-          platformio ci --lib="./lib/*" --project-option="lib_tdf_mode=chain+" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" ./dustboy_vm
+      # - name: Build firmware
+      #   run: |
+      #     platformio ci --lib="./lib/*" --project-option="lib_tdf_mode=chain+" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" ./dustboy_vm
       - name: Prepare artifacts
         run: |
+
+          pio run
 
           find $HOME | grep .bin$
 
           export BOARD_ENV="ESP32"
-
 
           echo "esptool.py --chip esp32 \
             --baud 460800 \
