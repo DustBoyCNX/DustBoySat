@@ -45,12 +45,19 @@ jobs:
 
           cp -Rv $HOME/.pio/build/$BOARD_ENV/firmware.bin "$HOME/firmware.bin"
           cp -Rv $HOME/.pio/build/$BOARD_ENV/partitions.bin "$HOME/partitions.bin"
-
-          cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/bin/bootloader_dio_40m.bin $HOME/bootloader_dio_40m.bin
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin $HOME
 
-          echo "esptool.py --chip esp32 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 bootloader_dio_40m.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > "$HOME/flash.sh"
-          #     esptool.py --chip esp32 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 bootloader_dio_40m.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin
+          echo "esptool.py --chip esp32 \
+            --baud 460800 \
+            --before default_reset \
+            --after hard_reset \
+            write_flash \
+            -z \
+            --flash_mode dio \
+            --flash_freq 40m \
+            --flash_size 4MB \
+            0x1000 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin" > "$HOME/flash.sh"
+
           zip --junk-paths $HOME/my-artifact $HOME/*.bin $HOME/*.sh
       - name: Create Release
         id: create_release
