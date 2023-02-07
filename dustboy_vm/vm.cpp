@@ -149,14 +149,14 @@ void loop()
                 app.lcd->wipe();
                 delay(10);
                 if (buffer[1] == '!')
-                { // `s!! means sleep 1 minute
-                    Serial.printf("1");
+                { // `s!! means sleep 10 minutes
+                    Serial.printf("10");
                     esp_sleep_enable_timer_wakeup(1 * 60 * 1000000);
                 }
                 else
                 {
                     Serial.printf("%d", (int)buffer[1]);
-                    esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
+                    esp_sleep_enable_timer_wakeup(buffer[1] * 1000000); // sleep in seconds
                 }
                 esp_deep_sleep_start();
             }
