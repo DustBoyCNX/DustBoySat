@@ -26,6 +26,7 @@ jobs:
       - name: pio run
         run: pio run
       - name: Build PlatformIO 
-        run: pio ci --project-option="lib_tdf_mode=chain+" --lib="./lib/*" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
+        # run: pio ci --project-option="lib_tdf_mode=chain+" --lib="./lib/*" --keep-build-dir --project-conf=./platformio.ini --build-dir="$HOME" .
+        run: pio ci -e ESP32 -l "./lib/*" --project-conf="./platformio.ini" --build-dir="$HOME/hello" --keep-build-dir  dustboy_vm
         env:
           PLATFORMIO_CI_SRC: ${{ matrix.example }}
