@@ -23,6 +23,41 @@ App app;
  */
 
 #include "vm_binding.hpp"
+#define DELAY_S 2
+
+void setupPms();
+
+void setup()
+{
+    Serial.begin(9600, SERIAL_8N2);
+    // Serial.begin(9600);
+    // Serial.begin(115200);
+    WiFi.softAPdisconnect(true);
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+    setupPms();
+
+    app.setup();
+    app.lcd->setTitle("RustBoy!");
+    app.lcd->setLabel("PM 2.5");
+
+    app.loop();
+    pms.requestRead();
+    // app.lcd->setDisplayValue
+
+    // Wait for serial port to connect
+    // Needed for native USB port onl
+    // while(!Serial) {}
+
+    // Serial.println("\nWasm3 v" M3_VERSION " (" M3_ARCH "), build " __DATE__ " " __TIME__);
+
+#ifdef ESP32
+    // On ESP32, we can launch in a separate thread
+    xTaskCreate(&wasm_task, "wasm3", NATIVE_STACK_SIZE, NULL, 5, NULL);
+#else
+    wasm_task(NULL);
+#endif
+}
 
 void setupPms()
 {
@@ -39,34 +74,6 @@ void setupPms()
         // Serial.println("Power on or reset");
     }
     // Serial.println("PMS setup done");
-}
-
-
-void setup()
-{
-    Serial.begin(9600, SERIAL_8N2);
-    WiFi.softAPdisconnect(true);
-    WiFi.disconnect(true);
-    WiFi.mode(WIFI_OFF);
-    setupPms();
-
-    app.setup();
-    app.lcd->setTitle("RustBoy!");
-    app.lcd->setLabel("PM 2.5");
-    // app.lcd->setDisplayValue
-
-    // Wait for serial port to connect
-    // Needed for native USB port onl
-    // while(!Serial) {}
-
-    // Serial.println("\nWasm3 v" M3_VERSION " (" M3_ARCH "), build " __DATE__ " " __TIME__);
-
-#ifdef ESP32
-    // On ESP32, we can launch in a separate thread
-    xTaskCreate(&wasm_task, "wasm3", NATIVE_STACK_SIZE, NULL, 5, NULL);
-#else
-    wasm_task(NULL);
-#endif
 }
 
 typedef struct __attribute((__packed__))
@@ -149,11 +156,13 @@ void loop()
             {
                 app.lcd->wipe();
                 delay(10);
-                if (buffer[1] == '!') { // `s!!
+                if (buffer[1] == '!')
+                { // `s!!
                     Serial.printf("10");
-                    esp_sleep_enable_timer_wakeup(10*60*1000000);
+                    esp_sleep_enable_timer_wakeup(10 * 60 * 1000000);
                 }
-                else {
+                else
+                {
                     Serial.printf("%d", (int)buffer[1]);
                     esp_sleep_enable_timer_wakeup(buffer[1] * 1000000);
                 }
@@ -182,5 +191,5 @@ void loop()
         }
         strcpy(buffer, "");
     }
-    delay(10*1000);
+    delay(DELAY_S * 1000);
 }
