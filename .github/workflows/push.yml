@@ -84,16 +84,22 @@ jobs:
             - ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/my-artifact.zip
-          asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
-          asset_content_type: application/zip
+          files: |
+            /home/runner/my-artifact.zip
+            /home/runner/fw/hello.bin
+      # - name: Upload Release Asset
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: /home/runner/my-artifact.zip
+      #     asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
+      #     asset_content_type: application/zip
 
       # - name: Upload Release Asset
       #   id: upload-release-asset2
