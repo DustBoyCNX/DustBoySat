@@ -86,6 +86,7 @@ jobs:
           prerelease: false
       - name: Release
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')        
         with:
           files: |
             /home/runner/my-artifact.zip
