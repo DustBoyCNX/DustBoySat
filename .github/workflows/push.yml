@@ -72,18 +72,18 @@ jobs:
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
 
           zip --junk-paths $HOME/my-artifact $HOME/.pio/build/$BOARD_ENV/*.bin $HOME/*.bin $HOME/*.sh
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.event.inputs.release_name }}
-          release_name: ${{ github.event.inputs.release_name }}-binary
-          body: |
-            - ${{ github.ref }}
-          draft: false
-          prerelease: false
+#      - name: Create Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: ${{ github.event.inputs.release_name }}
+#          release_name: ${{ github.event.inputs.release_name }}-binary
+#          body: |
+#            - ${{ github.ref }}
+#          draft: false
+#          prerelease: false
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')        
