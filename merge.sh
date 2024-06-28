@@ -10,6 +10,7 @@ if [ ! -d "fw" ]; then
 	mkdir fw
 fi
 # alias esptool.py=esptool
+alias esptool=esptool.py
 esptool --chip esp32 merge_bin \
 	-o fw/$output \
 	--flash_mode dio \
