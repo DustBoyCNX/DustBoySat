@@ -90,7 +90,7 @@ jobs:
             - ${{github.event.inputs.body}} with ${{ github.ref }}
           draft: true
           prerelease: false
-      - name: Upload Release Asset
+      - name: Upload zip file
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -101,7 +101,7 @@ jobs:
           asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
           asset_content_type: application/zip
 
-      - name: Upload Release Asset
+      - name: Upload full binary
         id: upload-release-asset2
         uses: actions/upload-release-asset@v1
         env:
