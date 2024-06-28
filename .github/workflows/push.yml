@@ -82,7 +82,7 @@ jobs:
           release_name: ${{ github.event.inputs.release_name }}-binary
           body: |
             - ${{ github.ref }}
-          draft: false
+          draft: true
           prerelease: false
       - name: Release
         uses: softprops/action-gh-release@v2
