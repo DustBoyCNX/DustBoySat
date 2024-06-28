@@ -91,6 +91,7 @@ jobs:
           files: |
             /home/runner/my-artifact.zip
             /home/runner/fw/hello.bin
+            fw/hello.bin
       # - name: Upload Release Asset
       #   id: upload-release-asset
       #   uses: actions/upload-release-asset@v1
