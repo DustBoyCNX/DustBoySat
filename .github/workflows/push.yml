@@ -89,8 +89,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')        
         with:
           files: |
-            /home/runner/my-artifact.zip
-            /home/runner/fw/hello.bin
             fw/hello.bin
       # - name: Upload Release Asset
       #   id: upload-release-asset
