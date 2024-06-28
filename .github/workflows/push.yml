@@ -87,7 +87,7 @@ jobs:
           tag_name: ${{ github.event.inputs.release_name }}
           release_name: ${{ github.event.inputs.release_name }}-binary
           body: |
-            - ${{ github.ref }}
+            - ${{github.event.inputs.body}} with ${{ github.ref }}
           draft: true
           prerelease: false
       - name: Upload Release Asset
