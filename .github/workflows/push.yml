@@ -72,7 +72,7 @@ jobs:
           cp -Rv .pio/build/$BOARD_ENV/firmware.bin "$HOME"
           cp -Rv .pio/build/$BOARD_ENV/partitions.bin "$HOME"
           cp -Rv .pio/build/$BOARD_ENV/bootloader.bin "$HOME"
-          cp -Rv fw/hello.bin "$HOME"
+          cp -Rv fw/hello.bin "$HOME/full.bin"
 
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
 
@@ -108,6 +108,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: /home/runner/hello.bin
-          asset_name: fw-full.bin
+          asset_path: /home/runner/full.bin
+          asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}-full.bin
           asset_content_type: application/octet-stream
