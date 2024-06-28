@@ -1,5 +1,10 @@
 name: DustBoy FW
 
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -14,10 +19,6 @@ on:
         default: "Release Notes"
 
 jobs:
-  permissions:
-    contents: write
-    pull-requests: write
-    repository-projects: write
   build:
     strategy:
       fail-fast: false
