@@ -44,7 +44,7 @@ jobs:
 
           find $HOME | grep .bin$
 
-          export BOARD_ENV="ESP32"
+          export BOARD_ENV="esp32dev"
 
           echo "esptool.py --chip esp32 \
             --baud 460800 \
@@ -67,6 +67,7 @@ jobs:
           cp -Rv .pio/build/$BOARD_ENV/firmware.bin "$HOME"
           cp -Rv .pio/build/$BOARD_ENV/partitions.bin "$HOME"
           cp -Rv .pio/build/$BOARD_ENV/bootloader.bin "$HOME"
+          cp -Rv fw/hello.bin "$HOME"
 
           cp -Rv $HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin "$HOME"
 
