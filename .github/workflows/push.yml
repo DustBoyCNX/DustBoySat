@@ -90,31 +90,24 @@ jobs:
             - ${{ github.ref }}
           draft: true
           prerelease: false
-#      - name: Release
-#        uses: softprops/action-gh-release@v2
-#        if: startsWith(github.ref, 'refs/tags/')        
-#        with:
-#          files: |
-#            /home/runner/my-artifact.zip
-#            fw/hello.bin
-       - name: Upload Release Asset
-         id: upload-release-asset
-         uses: actions/upload-release-asset@v1
-         env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         with:
-           upload_url: ${{ steps.create_release.outputs.upload_url }}
-           asset_path: /home/runner/my-artifact.zip
-           asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
-           asset_content_type: application/zip
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /home/runner/my-artifact.zip
+          asset_name: ${{ github.event.inputs.project_id}}-${{ github.event.inputs.release_name }}.zip
+          asset_content_type: application/zip
 
-        - name: Upload Release Asset
-          id: upload-release-asset2
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-            asset_path: /home/runner/hello.bin
-            asset_name: fw-full.bin
-            asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        id: upload-release-asset2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: /home/runner/hello.bin
+          asset_name: fw-full.bin
+          asset_content_type: application/octet-stream
