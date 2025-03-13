@@ -27,6 +27,7 @@ App app;
 void setupPms()
 {
     Serial1.begin(9600, SERIAL_8N1, 32, 33);
+    delay(10000); // Sleep for 10 seconds before setting passive mode    
     pms.passiveMode(); // Switch to passive mode
     pms.wakeUp();
     // detect boot from deepsleep
